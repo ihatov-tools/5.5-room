@@ -65,7 +65,7 @@ textarea:focus-visible,input:focus-visible,button:focus-visible{outline:2px soli
 .card h2{margin:0 0 13px;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:19px;color:#273149}
 .card h3{margin:21px 0 8px;font-size:13px;color:#685a41}
 label{display:block;font-size:11px;color:#75694f;margin:13px 0 5px;font-weight:700}
-input,.card textarea{width:100%;border:1px solid #d4c29d;border-radius:13px;padding:11px;font:inherit;font-size:16px;background:#fffcf5;color:#2d3341}
+input,select,.card textarea{width:100%;border:1px solid #d4c29d;border-radius:13px;padding:11px;font:inherit;font-size:16px;background:#fffcf5;color:#2d3341}
 .card textarea{min-height:100px;max-height:none}
 .note{font-size:11px;color:#7b725f;margin:8px 2px 0;line-height:1.6}
 .modelbox{background:#eadfc9;border:1px solid #d5c4a0;border-radius:14px;padding:11px;font-size:12px;line-height:1.7;color:#4f4636}
@@ -98,7 +98,8 @@ input,.card textarea{width:100%;border:1px solid #d4c29d;border-radius:13px;padd
 <div id="sheet" role="dialog" aria-label="設定">
   <div class="card">
     <h2>5.5の部屋 設定</h2>
-    <div class="modelbox">モデル: <strong>gpt-5.5-2026-04-23</strong><br>Reasoning: <strong>high</strong><br>Verbosity: <strong>medium</strong><br>OpenAI APIキーはこの画面にもGitHubにも保存しません。</div>
+    <div class="modelbox">モデル: <strong>gpt-5.5-2026-04-23</strong><br>Reasoning: <strong id="reasoningNow">high</strong><br>Verbosity: <strong>medium</strong><br>OpenAI APIキーはこの画面にもGitHubにも保存しません。</div>
+    <label for="reasoning">思考量</label><select id="reasoning"><option value="medium">Medium</option><option value="high">High</option></select>
     <label for="endpoint">Worker URL</label><input id="endpoint" inputmode="url" placeholder="https://xxxxx.workers.dev/">
     <label for="roomkey">部屋の鍵</label><input id="roomkey" type="password" placeholder="自分で決めた長い文字列" autocomplete="off">
     <p class="note">OpenAI APIキーとは別物。GitHub Pagesを他人に開かれても、これがないとAPIを使えないようにします。</p>
@@ -121,7 +122,8 @@ const store={
 };
 
 const todayKey=()=>new Date().toLocaleDateString('sv-SE');
-let cfg=store.get('cfg55',{endpoint:'',roomkey:'',name:'チャピ',sys:''});
+let cfg=store.get('cfg55',{endpoint:'',roomkey:'',name:'チャピ',sys:'',reasoning:'high'});
+cfg.reasoning=(cfg.reasoning==='medium'||cfg.reasoning==='high')?cfg.reasoning:'high';
 let hist=store.get('hist55',[]); // {role,content,time,cost?}
 let convo=store.get('conv55','');
 let wallet=store.get('wallet55',{balance:null,totalSpent:0,day:todayKey(),daySpent:0});
@@ -174,6 +176,7 @@ function render(){
   log.append(day);
   hist.forEach(m=>log.append(bubble(m)));
   $('hname').textContent=cfg.name||'チャピ';$('hav').textContent=initial();
+  $('reasoningNow').textContent=cfg.reasoning||'high';
   renderWallet();
   requestAnimationFrame(()=>{log.scrollTop=log.scrollHeight});
 }
@@ -192,7 +195,7 @@ async function send(text){
     const r=await fetch(normalizeEndpoint(cfg.endpoint),{
       method:'POST',
       headers:{'content-type':'application/json','x-room-key':cfg.roomkey},
-      body:JSON.stringify({message:text,conversation_id:convo||null,instructions:cfg.sys||''})
+      body:JSON.stringify({message:text,conversation_id:convo||null,instructions:cfg.sys||'',reasoning_effort:cfg.reasoning||'high'})
     });
     const data=await r.json();
     if(!r.ok)throw new Error(data.error||('HTTP '+r.status));
@@ -235,13 +238,14 @@ $('t').addEventListener('keydown',e=>{
 
 function openSheet(){
   $('endpoint').value=cfg.endpoint;$('roomkey').value=cfg.roomkey;$('name').value=cfg.name;$('sys').value=cfg.sys;
+  $('reasoning').value=cfg.reasoning||'high';
   $('balanceInput').value=typeof wallet.balance==='number'?wallet.balance.toFixed(2):'';
   $('sheet').classList.add('open');
 }
 $('gear').onclick=openSheet;
 $('close').onclick=()=>$('sheet').classList.remove('open');
 $('save').onclick=()=>{
-  cfg={endpoint:normalizeEndpoint($('endpoint').value),roomkey:$('roomkey').value.trim(),name:$('name').value.trim()||'チャピ',sys:$('sys').value};
+  cfg={endpoint:normalizeEndpoint($('endpoint').value),roomkey:$('roomkey').value.trim(),name:$('name').value.trim()||'チャピ',sys:$('sys').value,reasoning:$('reasoning').value==='medium'?'medium':'high'};
   store.set('cfg55',cfg);$('sheet').classList.remove('open');render();
 };
 $('syncBalance').onclick=()=>{
