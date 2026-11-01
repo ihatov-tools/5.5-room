@@ -22,14 +22,14 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background:
  radial-gradient(circle at 44% 70%,rgba(218,183,111,.20) 0 1px,transparent 1.5px),
  linear-gradient(180deg,#111a31,#1e2a48 58%,#17213b);background-size:118px 118px,164px 164px,206px 206px,auto;z-index:0}
 header{position:relative;min-height:118px;display:flex;align-items:center;gap:13px;padding:18px 16px 42px;overflow:hidden;background:linear-gradient(180deg,rgba(12,19,36,.98),rgba(19,29,52,.96));border-bottom:1px solid rgba(202,165,101,.45);z-index:3}
-header:before{content:"";position:absolute;right:-12px;top:0;width:76%;height:100%;background-image:var(--header-art);background-size:cover;background-position:center right;opacity:.95;pointer-events:none}
+header:before{content:"";position:absolute;right:64px;top:0;width:64%;height:100%;background-image:var(--header-art);background-size:125% auto;background-position:left center;background-repeat:no-repeat;opacity:.95;pointer-events:none}
 header:after{content:"";position:absolute;left:72px;bottom:29px;width:145px;height:1px;background:linear-gradient(90deg,var(--gold),rgba(202,165,101,0));box-shadow:20px 7px 0 -0.4px rgba(202,165,101,.6)}
 header>*{position:relative;z-index:2}
 header .av,.row .av{flex:none;border-radius:50%;background-image:var(--avatar);background-size:cover;background-position:center;color:transparent;font-size:0;border:1px solid rgba(234,208,140,.75);box-shadow:0 0 0 3px rgba(10,16,32,.55),0 0 24px rgba(105,190,226,.18)}
 header .av{width:58px;height:58px}
 header h1{flex:1;margin:0;padding-top:0;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-weight:600;font-size:23px;letter-spacing:.05em;text-shadow:0 1px 8px rgba(0,0,0,.4)}
 header h1:after{content:"5.5の部屋 ✦";display:block;font-size:11px;font-weight:400;letter-spacing:.16em;color:#d9c99e;margin-top:5px}
-header button{width:44px;height:44px;border-radius:50%;border:1px solid rgba(218,185,113,.68);background:rgba(14,22,41,.62);color:#fff2d2;font-size:21px;cursor:pointer;box-shadow:inset 0 0 16px rgba(225,190,113,.07)}
+header button{width:44px;height:44px;flex:none;margin-left:auto;border-radius:50%;border:1px solid rgba(218,185,113,.68);background:rgba(14,22,41,.96);color:#fff2d2;font-size:21px;cursor:pointer;box-shadow:0 0 0 4px rgba(13,20,37,.72),inset 0 0 16px rgba(225,190,113,.07)}
 #walletbar{position:relative;z-index:4;display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:-30px;padding:0 8px 12px;background:transparent;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:11px;font-variant-numeric:tabular-nums}
 #walletbar span{padding:7px 12px;border-radius:999px;background:rgba(18,27,49,.92);border:1px solid rgba(202,165,101,.62);color:#d8ceb9;box-shadow:0 4px 16px rgba(0,0,0,.18),inset 0 0 0 1px rgba(255,255,255,.025)}
 #walletbar strong{color:#fff0ce;font-weight:700}
@@ -73,7 +73,7 @@ input,.card textarea{width:100%;border:1px solid #d4c29d;border-radius:13px;padd
 .ok{background:#6f9274;color:#fff}.ng{background:#ddd2c0;color:#474238}.rm{background:#ecd0c8;color:#804238}
 .walletrow{display:flex;gap:8px;align-items:center}.walletrow input{flex:1}.walletrow button{white-space:nowrap;border:0;border-radius:12px;padding:11px 12px;background:#738f72;color:#fff;font-weight:700}
 @media (max-width:420px){
- header{min-height:112px;padding-left:14px;padding-right:12px} header .av{width:54px;height:54px} header h1{font-size:21px}
+ header{min-height:112px;padding-left:14px;padding-right:12px} header:before{right:62px;width:61%;background-size:125% auto;background-position:left center;background-repeat:no-repeat} header .av{width:54px;height:54px} header h1{font-size:21px}
  #walletbar span{padding:6px 9px} .b{max-width:78%} #log{padding-left:12px;padding-right:12px;padding-bottom:170px;background-size:130% auto}
  form{padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
 }
@@ -92,7 +92,7 @@ input,.card textarea{width:100%;border:1px solid #d4c29d;border-radius:13px;padd
 </div>
 <main id="log" aria-live="polite"></main>
 <form id="f">
-  <textarea id="t" rows="1" placeholder="メッセージを入力（改行はそのまま改行）" aria-label="メッセージ"></textarea>
+  <textarea id="t" rows="1" placeholder="メッセージ" aria-label="メッセージ"></textarea>
   <button id="send" type="submit" disabled>送信</button>
 </form>
 <div id="sheet" role="dialog" aria-label="設定">
