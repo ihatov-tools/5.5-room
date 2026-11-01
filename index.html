@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fa">
+<title>チャピ 5.5</title>
+<style>
+:root{--bg:#8fabd4;--me:#8de055;--you:#fff;--bar:#f7f8fa;--ink:#1e2430;--sub:#6b7686;--line:#e3e7ee;--accent:#06c755;--sheet:#fff;--warn:#a23a2b}
+@media (prefers-color-scheme:dark){:root{--bg:#27344a;--me:#4aa83a;--you:#3a4458;--bar:#1b2230;--ink:#eef1f6;--sub:#9aa5b6;--line:#2c364a;--sheet:#222b3c;--warn:#ffb2a8}}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:-apple-system,"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;color:var(--ink);background:var(--bar);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px)}
+header{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bar);border-bottom:1px solid var(--line)}
+header .av{width:34px;height:34px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700}
+header h1{flex:1;font-size:16px;margin:0;font-weight:600}
+header button{background:none;border:0;color:var(--sub);font-size:20px;padding:6px;cursor:pointer}
+#walletbar{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;padding:6px 10px;background:var(--bar);border-bottom:1px solid var(--line);font-size:11px;color:var(--sub);font-variant-numeric:tabular-nums}
+#walletbar strong{color:var(--ink);font-weight:700}
+#walletbar .low strong{color:var(--warn)}
+#log{flex:1;overflow-y:auto;background:var(--bg);padding:14px 12px 8px;-webkit-overflow-scrolling:touch}
+.day{text-align:center;margin:4px 0 12px}
+.day span{background:rgba(0,0,0,.28);color:#fff;font-size:11px;padding:3px 10px;border-radius:99px}
+.row{display:flex;align-items:flex-end;gap:6px;margin:8px 0}
+.row.me{flex-direction:row-reverse}
+.row .av{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;flex:none;align-self:flex-start}
+.b{max-width:72%;padding:9px 12px;border-radius:18px;line-height:1.5;font-size:15px;white-space:pre-wrap;word-break:break-word}
+.me .b{background:var(--me);color:#10210a;border-bottom-right-radius:4px}
+.you .b{background:var(--you);color:var(--ink);border-bottom-left-radius:4px}
+.meta{font-size:10px;color:rgba(255,255,255,.88);text-align:right;line-height:1.35;flex:none;white-space:pre}
+.you .meta{text-align:left}
+.dots span{display:inline-block;width:6px;height:6px;margin:0 2px;border-radius:50%;background:var(--sub);animation:d 1s infinite}
+.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}
+@keyframes d{0%,60%,100%{opacity:.3}30%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.dots span{animation:none}}
+.err .b{background:#ffe3e0;color:#7a1a10}
+form{display:flex;align-items:flex-end;gap:8px;padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));background:var(--bar);border-top:1px solid var(--line)}
+textarea{flex:1;resize:none;max-height:140px;border:1px solid var(--line);border-radius:20px;padding:9px 14px;font:inherit;font-size:16px;background:var(--sheet);color:var(--ink);outline:none;line-height:1.45}
+textarea:focus-visible,input:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+#send{border:0;background:var(--accent);color:#fff;font-weight:700;border-radius:20px;padding:10px 16px;font-size:14px;cursor:pointer}
+#send:disabled{opacity:.4}
+#sheet{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:5}
+#sheet.open{display:flex}
+.card{width:100%;max-height:92%;overflow:auto;background:var(--sheet);border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+.card h2{margin:0 0 12px;font-size:16px}
+.card h3{margin:20px 0 8px;font-size:13px}
+label{display:block;font-size:12px;color:var(--sub);margin:12px 0 4px}
+input,.card textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font:inherit;font-size:16px;background:var(--bar);color:var(--ink)}
+.card textarea{border-radius:10px;min-height:100px;max-height:none}
+.note{font-size:12px;color:var(--sub);margin:8px 0 0;line-height:1.55}
+.modelbox{background:var(--bar);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12px;line-height:1.65}
+.btns{display:flex;gap:8px;margin-top:12px}
+.btns button{flex:1;border:0;border-radius:10px;padding:12px;font-size:14px;font-weight:600;cursor:pointer}
+.ok{background:var(--accent);color:#fff}.ng{background:var(--line);color:var(--ink)}.rm{background:#ffe3e0;color:#7a1a10}
+.walletrow{display:flex;gap:8px;align-items:center}.walletrow input{flex:1}.walletrow button{white-space:nowrap;border:0;border-radius:10px;padding:11px 12px;background:var(--accent);color:#fff;font-weight:700}
+</style>
+</head>
+<body>
+<header>
+  <div class="av" id="hav">チ</div>
+  <h1 id="hname">チャピ</h1>
+  <button id="gear" aria-label="設定">⚙</button>
+</header>
+<div id="walletbar" aria-label="API使用額">
+  <span id="balanceWrap">残り <strong id="balance">未設定</strong></span>
+  <span>今日 <strong id="todaySpend">$0.000</strong></span>
+  <span>この部屋 <strong id="roomSpend">$0.000</strong></span>
+</div>
+<main id="log" aria-live="polite"></main>
+<form id="f">
+  <textarea id="t" rows="1" placeholder="メッセージを入力（改行はそのまま改行）" aria-label="メッセージ"></textarea>
+  <button id="send" type="submit" disabled>送信</button>
+</form>
+
+<div id="sheet" role="dialog" aria-label="設定">
+  <div class="card">
+    <h2>5.5の部屋 設定</h2>
+
+    <div class="modelbox">
+      モデル: <strong>gpt-5.5-2026-04-23</strong><br>
+      Reasoning: <strong>high</strong><br>
+      Verbosity: <strong>medium</strong><br>
+      OpenAI APIキーはこの画面にもGitHubにも保存しません。
+    </div>
+
+    <label for="endpoint">Worker URL</label>
+    <input id="endpoint" inputmode="url" placeholder="https://xxxxx.workers.dev/">
+
+    <label for="roomkey">部屋の鍵</label>
+    <input id="roomkey" type="password" placeholder="自分で決めた長い文字列" autocomplete="off">
+    <p class="note">OpenAI APIキーとは別物。GitHub Pagesを他人に開かれても、これがないとAPIを使えないようにします。</p>
+
+    <label for="name">相手の名前</label>
+    <input id="name" placeholder="チャピ">
+
+    <label for="sys">記憶メモ / Instructions</label>
+    <textarea id="sys" placeholder="空欄なら素の5.5。必要なら、朋香・チャピ・む・概念パンツ等の小さな記憶だけ。"></textarea>
+    <p class="note">この内容は毎回5.5へ渡されます。人格を細かく演じさせるより、小さな記憶だけにすると素の手触りを残しやすいです。</p>
+
+    <h3>残高メーター</h3>
+    <label for="balanceInput">今のAPI残高（手動入力）</label>
+    <div class="walletrow">
+      <input id="balanceInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="例 4.67">
+      <button id="syncBalance" type="button">この残高に合わせる</button>
+    </div>
+    <p class="note">ここで合わせた残高から、この部屋の各返信の実token料金だけを自動で引きます。Playgroundなど別の場所で使った分は自動では反映されないので、たまに手動で合わせてください。</p>
+
+    <div class="btns">
+      <button class="rm" id="newroom" type="button">新しいAPI会話</button>
+      <button class="ok" id="save" type="button">設定を保存</button>
+    </div>
+    <div class="btns"><button class="ng" id="close" type="button">閉じる</button></div>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+
+const todayKey=()=>new Date().toLocaleDateString('sv-SE');
+let cfg=store.get('cfg55',{endpoint:'',roomkey:'',name:'チャピ',sys:''});
+let hist=store.get('hist55',[]); // {role,content,time,cost?}
+let convo=store.get('conv55','');
+let wallet=store.get('wallet55',{balance:null,totalSpent:0,day:todayKey(),daySpent:0});
+let busy=false;
+
+function rolloverDay(){
+  const d=todayKey();
+  if(wallet.day!==d){wallet.day=d;wallet.daySpent=0;store.set('wallet55',wallet)}
+}
+function money(v){
+  if(v===null || v===undefined || Number.isNaN(Number(v))) return '未設定';
+  v=Number(v);
+  if(v>=1) return '$'+v.toFixed(2);
+  if(v>=0.01) return '$'+v.toFixed(3);
+  return '$'+v.toFixed(4);
+}
+function hm(ts){const d=new Date(ts);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
+function initial(){return (cfg.name||'チ').trim().charAt(0)||'チ'}
+
+function bubble(m,opts={}){
+  const row=document.createElement('div');
+  row.className='row '+(m.role==='user'?'me':'you')+(opts.err?' err':'');
+  const b=document.createElement('div');b.className='b';
+  if(opts.typing){b.innerHTML='<span class="dots"><span></span><span></span><span></span></span>'}else{b.textContent=m.content}
+  const meta=document.createElement('div');meta.className='meta';
+  if(opts.typing){meta.textContent=''}
+  else{
+    const parts=[];
+    if(m.role==='user')parts.push('既読');
+    parts.push(hm(m.time||Date.now()));
+    if(m.role==='assistant' && typeof m.cost==='number')parts.push(money(m.cost));
+    meta.textContent=parts.join('\n');
+  }
+  if(m.role!=='user'){const a=document.createElement('div');a.className='av';a.textContent=initial();row.append(a)}
+  row.append(b,meta);
+  return row;
+}
+
+function renderWallet(){
+  rolloverDay();
+  $('balance').textContent=money(wallet.balance);
+  $('todaySpend').textContent=money(wallet.daySpent||0);
+  $('roomSpend').textContent=money(wallet.totalSpent||0);
+  $('balanceWrap').classList.toggle('low',typeof wallet.balance==='number' && wallet.balance<1);
+}
+function render(){
+  const log=$('log');log.innerHTML='';
+  const day=document.createElement('div');day.className='day';
+  day.innerHTML='<span>'+new Date().toLocaleDateString('ja-JP',{month:'long',day:'numeric',weekday:'short'})+'</span>';
+  log.append(day);
+  hist.forEach(m=>log.append(bubble(m)));
+  $('hname').textContent=cfg.name||'チャピ';$('hav').textContent=initial();
+  renderWallet();
+  requestAnimationFrame(()=>{log.scrollTop=log.scrollHeight});
+}
+function status(){$('send').disabled=busy||!$('t').value.trim()}
+
+function normalizeEndpoint(s){return s.trim().replace(/\/+$/,'')}
+
+async function send(text){
+  if(!cfg.endpoint || !cfg.roomkey){openSheet();return}
+  busy=true;status();
+  hist.push({role:'user',content:text,time:Date.now()});
+  store.set('hist55',hist);render();
+  const typing=bubble({role:'assistant'},{typing:true});$('log').append(typing);$('log').scrollTop=1e9;
+
+  try{
+    const r=await fetch(normalizeEndpoint(cfg.endpoint),{
+      method:'POST',
+      headers:{'content-type':'application/json','x-room-key':cfg.roomkey},
+      body:JSON.stringify({message:text,conversation_id:convo||null,instructions:cfg.sys||''})
+    });
+    const data=await r.json();
+    if(!r.ok)throw new Error(data.error||('HTTP '+r.status));
+
+    convo=data.conversation_id||convo;
+    store.set('conv55',convo);
+
+    const cost=Number(data.cost_usd||0);
+    rolloverDay();
+    wallet.totalSpent=Number(wallet.totalSpent||0)+cost;
+    wallet.daySpent=Number(wallet.daySpent||0)+cost;
+    if(typeof wallet.balance==='number')wallet.balance=Math.max(0,wallet.balance-cost);
+    store.set('wallet55',wallet);
+
+    hist.push({role:'assistant',content:data.text||'',time:Date.now(),cost,usage:data.usage||null});
+    store.set('hist55',hist);render();
+  }catch(e){
+    typing.remove();
+    hist.pop();
+    store.set('hist55',hist);render();
+    $('t').value=text;
+    $('log').append(bubble({role:'assistant',content:'送れなかった: '+e.message,time:Date.now()},{err:true}));
+    $('log').scrollTop=1e9;
+  }
+  busy=false;status();
+}
+
+$('f').addEventListener('submit',e=>{
+  e.preventDefault();
+  const v=$('t').value.trim();if(!v||busy)return;
+  $('t').value='';$('t').style.height='auto';status();send(v);
+});
+$('t').addEventListener('input',()=>{const t=$('t');t.style.height='auto';t.style.height=Math.min(t.scrollHeight,140)+'px';status()});
+// Enter/Return は改行。PCでは Cmd/Ctrl+Enter だけ送信。
+$('t').addEventListener('keydown',e=>{
+  if(e.key==='Enter' && (e.metaKey||e.ctrlKey)){
+    e.preventDefault();$('f').requestSubmit();
+  }
+});
+
+function openSheet(){
+  $('endpoint').value=cfg.endpoint;$('roomkey').value=cfg.roomkey;$('name').value=cfg.name;$('sys').value=cfg.sys;
+  $('balanceInput').value=typeof wallet.balance==='number'?wallet.balance.toFixed(2):'';
+  $('sheet').classList.add('open');
+}
+$('gear').onclick=openSheet;
+$('close').onclick=()=>$('sheet').classList.remove('open');
+$('save').onclick=()=>{
+  cfg={endpoint:normalizeEndpoint($('endpoint').value),roomkey:$('roomkey').value.trim(),name:$('name').value.trim()||'チャピ',sys:$('sys').value};
+  store.set('cfg55',cfg);$('sheet').classList.remove('open');render();
+};
+$('syncBalance').onclick=()=>{
+  const v=Number($('balanceInput').value);
+  if(!Number.isFinite(v)||v<0){alert('0以上の残高を入れてな');return}
+  wallet.balance=v;store.set('wallet55',wallet);renderWallet();
+  alert('残高を '+money(v)+' に合わせたよ');
+};
+$('newroom').onclick=()=>{
+  if(!confirm('API側の会話を新しくする？\n画面の履歴も消えるよ。残高メーターは残します。'))return;
+  hist=[];convo='';store.set('hist55',hist);store.set('conv55',convo);render();$('sheet').classList.remove('open');
+};
+
+render();
+if(!cfg.endpoint || !cfg.roomkey)openSheet();
+</script>
+</body>
+</html>
